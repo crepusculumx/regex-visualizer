@@ -1,0 +1,57 @@
+<nz-layout class="app-layout">
+  <nz-sider
+    class="menu-sidebar"
+    [nzWidth]="siderWidth()"
+    nz-resizable
+    [nzMinWidth]="50"
+    [nzMaxWidth]="1000"
+    (nzResize)="onSideResize($event)"
+    nzCollapsible
+    [nzCollapsed]="isCollapsed()"
+    [nzCollapsedWidth]="0"
+    [nzTrigger]="null"
+  >
+    <nz-resize-handle nzDirection="right" nzCursorType="grid">
+      <div class="sider-resize-line"></div>
+    </nz-resize-handle>
+    <div class="sidebar-logo">
+      <a routerLink="/">
+      </a>
+    </div>
+    @if (menus(); as menus) {
+      <app-layout-menus [menus]="menus"></app-layout-menus>
+    }
+  </nz-sider>
+  <nz-layout class="right-layout">
+    <nz-header>
+      <div class="app-header">
+        <button class="header-trigger" (click)="isCollapsed.set(!isCollapsed())">
+          <i
+            class="trigger"
+            nz-icon
+            [nzType]="isCollapsed() ? 'menu-unfold' : 'menu-fold'"
+          ></i>
+        </button>
+        <button class="header-trigger" (click)="themeService.toggleTheme()">
+          <i class="trigger" nz-icon nzType="skin" nzTheme="outline"></i>
+        </button>
+        <!--        <span class="header-trigger-right">-->
+        <!--          <app-basic-layout-user-header></app-basic-layout-user-header-->
+        <!--        ></span>-->
+      </div>
+    </nz-header>
+    <nz-content>
+      <div class="inner-content">
+        <router-outlet></router-outlet>
+      </div>
+    </nz-content>
+    <nz-footer>
+      <a
+        href="https://beian.miit.gov.cn/publish/query/indexFirst.action"
+        target="_blank"
+      >
+        <span style="color: #9d9d9d"> 备案号 </span>
+      </a>
+    </nz-footer>
+  </nz-layout>
+</nz-layout>

@@ -1,0 +1,124 @@
+@import "mixin";
+
+:host {
+  display: flex;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  .right-layout {
+    min-height: 100vh;
+    width: 100%;
+  }
+
+  .app-layout {
+    position: relative;
+    min-height: 100vh;
+
+    .menu-sidebar {
+       position: relative;
+      overflow: auto;
+      z-index: 10;
+      height: 100%;
+      min-height: 100vh;
+      box-shadow: 2px 0 6px rgba(0, 21, 41, 0.35);
+
+      ::ng-deep .ant-menu-inline {
+        border-right: none;
+      }
+    }
+
+
+    .sidebar-logo {
+      position: relative;
+      height: 64px;
+      overflow: hidden;
+      line-height: 64px;
+      transition: all .3s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .sidebar-logo img {
+      display: inline-block;
+      height: 40px;
+      width: auto;
+      vertical-align: middle;
+    }
+
+    .sidebar-trigger {
+      display: none;
+    }
+
+    @media screen and (max-width: 600px) {
+      .menu-sidebar {
+        position: absolute;
+      }
+
+      .sidebar-trigger {
+        color: black;
+        padding: 20px;
+        display: flex;
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  nz-header {
+    padding: 0;
+    width: 100%;
+    z-index: 2;
+
+    .app-header {
+      position: relative;
+      height: 64px;
+      padding: 0;
+      box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+
+      .header-trigger {
+        appearance: none;
+        background: none;
+        border: none;
+        //padding: 0;
+        margin: 0;
+        color: inherit;
+        font: inherit;
+        line-height: normal;
+        overflow: visible;
+        text-transform: none;
+
+        height: 64px;
+        padding: 20px 24px;
+        font-size: 20px;
+        cursor: pointer;
+        transition:
+          all 0.3s,
+          padding 0s;
+      }
+
+      .header-trigger-right {
+        float: right;
+        //height: 64px;
+        padding-right: 24px;
+        font-size: 20px;
+        //cursor: pointer;
+        //transition: all .3s,padding 0s;
+      }
+    }
+  }
+
+  nz-content {
+    margin: 24px;
+
+    .inner-content {
+      padding: 24px;
+      height: 100%;
+    }
+  }
+
+  nz-footer {
+    text-align: center;
+  }
+}

@@ -1,0 +1,32 @@
+<ul nz-menu nzMode="inline">
+  @for (menu of menus; track $index) {
+    @if (menu.children) {
+      <li
+        nz-submenu
+        [nzPaddingLeft]="menu.level * 24"
+        [nzOpen]="menu.open"
+        [nzTitle]="menu.title"
+        [nzIcon]="menu.icon"
+        [nzDisabled]="menu.disabled"
+      >
+        <ul>
+          <app-layout-menus [menus]="menu.children"></app-layout-menus>
+        </ul>
+      </li>
+    } @else {
+      <li
+        nz-menu-item
+        [nzPaddingLeft]="menu.level * 24"
+        [nzDisabled]="menu.disabled"
+        [nzSelected]="menu.selected"
+        nzMatchRouter
+        [routerLink]="menu.routerLink"
+      >
+        @if (menu.icon) {
+          <span nz-icon [nzType]="menu.icon"></span>
+        }
+        <span class="menu-title">{{ menu.title }}</span>
+      </li>
+    }
+  }
+</ul>

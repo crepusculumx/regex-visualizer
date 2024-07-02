@@ -12,6 +12,7 @@ import zh from '@angular/common/locales/zh';
 import { FormsModule } from '@angular/forms';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient } from '@angular/common/http';
+import { AppInitializerProvider } from './services/app-initializer.service';
 
 registerLocaleData(zh);
 
@@ -23,5 +24,6 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(FormsModule),
     provideAnimationsAsync(),
     provideHttpClient(),
+    AppInitializerProvider,
   ],
 };
