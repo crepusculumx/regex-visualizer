@@ -17,6 +17,10 @@ module.exports = tseslint.config(
     ],
     processor: angular.processInlineTemplates,
     rules: {
+
+
+
+
       "@angular-eslint/directive-selector": [
         "error",
         {
@@ -33,6 +37,7 @@ module.exports = tseslint.config(
           style: "kebab-case",
         },
       ],
+
     },
   },
   {
@@ -41,6 +46,8 @@ module.exports = tseslint.config(
       ...angular.configs.templateRecommended,
       ...angular.configs.templateAccessibility,
     ],
-    rules: {},
+    rules: {
+      "@angular-eslint/template/label-has-associated-control": "off",
+    },
   }
 );

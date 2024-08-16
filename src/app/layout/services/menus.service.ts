@@ -6,7 +6,44 @@ import { Menus } from '../interfaces/menu';
   providedIn: 'root',
 })
 export class MenusService {
-  private _menus$ = new BehaviorSubject<Menus>([]);
+  private _menus$ = new BehaviorSubject<Menus>([
+    {
+      title: '模型可视化',
+      level: 1,
+      icon: '',
+      selected: false,
+      disabled: false,
+      open: true,
+      children: [
+        {
+          title: 'DFA',
+          level: 2,
+          icon: '',
+          selected: false,
+          disabled: false,
+          routerLink: ['dfa'],
+        },
+      ],
+    },
+    {
+      title: '模型转化',
+      level: 1,
+      icon: '',
+      selected: false,
+      disabled: false,
+      open: true,
+      children: [
+        {
+          title: 'DFA极小化',
+          level: 2,
+          icon: '',
+          selected: false,
+          disabled: false,
+          routerLink: ['dfa-minimize'],
+        },
+      ],
+    },
+  ]);
   get menus$(): Observable<Menus> {
     return this._menus$.asObservable();
   }

@@ -10,6 +10,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { Menus } from '../interfaces/menu';
 import { NzResizableModule, NzResizeEvent } from 'ng-zorro-antd/resizable';
 import { toSignal } from '@angular/core/rxjs-interop';
+
 @Component({
   selector: 'app-basic-layout',
   standalone: true,
