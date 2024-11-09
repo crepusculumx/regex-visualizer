@@ -47,9 +47,9 @@
           <td nzLeft>{{ $index }}</td>
           <td>
             <label
-              nz-checkbox
+              nz-radio
               [ngModel]="row.isS$ | async"
-              (ngModelChange)="row.isS$.next($event)"
+              (ngModelChange)="dfaTableInput.s$.next($index)"
             ></label>
           </td>
           <td>

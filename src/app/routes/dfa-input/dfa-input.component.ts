@@ -19,6 +19,7 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 
 import { StateId, Terminal } from '../../regex-fa/regex-fa';
 import { FlatDfa } from '../../regex-fa/dfa';
+import { NzRadioModule } from 'ng-zorro-antd/radio';
 
 interface DfaTableRowParam {
   stateId: StateId;
@@ -36,7 +37,7 @@ interface DfaTableParams {
 
 interface DfaTableRowParamInputs {
   stateId$: BehaviorSubject<StateId>;
-  isS$: BehaviorSubject<boolean>;
+  isS$: Observable<boolean>;
   isF$: BehaviorSubject<boolean>;
   transTable: BehaviorSubject<number | null>[];
 }
@@ -46,6 +47,7 @@ interface DfaTableInputs {
   terminalsSize: number;
   terminals: BehaviorSubject<Terminal | null>[];
   rows: DfaTableRowParamInputs[];
+  s$: BehaviorSubject<number>;
 }
 
 @Component({
@@ -60,11 +62,13 @@ interface DfaTableInputs {
     NzTableModule,
     FormsModule,
     AsyncPipe,
+    NzRadioModule,
   ],
   templateUrl: './dfa-input.component.html',
   styleUrl: './dfa-input.component.less',
 })
 export class DfaInputComponent {
+  // When the number of rows changes, retain the filled in content.
   private dfaTableParams: DfaTableParams = {
     rows: [],
     statesSize: 1,
@@ -79,7 +83,10 @@ export class DfaInputComponent {
     this.statesSize$,
     this.terminalsSize$,
   ]).pipe(
+    // Resize this.dfaTableParams
     tap(([statesSize, terminalsSize]) => {
+      this.dfaTableParams.statesSize = statesSize;
+      this.dfaTableParams.terminalsSize = terminalsSize;
       while (this.dfaTableParams.rows.length > statesSize) {
         this.dfaTableParams.rows.pop();
       }
@@ -87,12 +94,14 @@ export class DfaInputComponent {
         this.dfaTableParams.terminals.pop();
       }
     }),
+    // Build new DfaTableInputs
     map(([statesSize, terminalsSize]) => {
       const res: DfaTableInputs = {
         statesSize: statesSize,
         terminalsSize: terminalsSize,
         rows: [],
         terminals: [],
+        s$: new BehaviorSubject(0),
       };
 
       for (let i = 0; i < terminalsSize; i++) {
@@ -112,10 +121,10 @@ export class DfaInputComponent {
               ? this.dfaTableParams.rows[i].isF
               : false,
           ),
-          isS$: new BehaviorSubject<boolean>(
-            this.dfaTableParams.rows.length > i
-              ? this.dfaTableParams.rows[i].isS
-              : false,
+          isS$: res.s$.pipe(
+            map((s) => {
+              return s == i;
+            }),
           ),
           stateId$: new BehaviorSubject<StateId>(i),
           transTable: [],
