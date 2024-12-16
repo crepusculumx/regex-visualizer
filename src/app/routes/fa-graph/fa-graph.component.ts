@@ -33,8 +33,11 @@ export class FaGraphComponent implements OnInit, AfterViewInit {
     combineLatest([this.graph$, this.data$])
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(([graph, data]) => {
-        graph.setData(data);
-        graph.render();
+        // G6 bug, clear first.
+        graph.clear().then(() => {
+          graph.setData(data);
+          graph.render();
+        });
       });
   }
 
@@ -49,12 +52,14 @@ export class FaGraphComponent implements OnInit, AfterViewInit {
       autoResize: true,
       autoFit: 'view',
       padding: 10,
+      animation: false,
       node: {},
       edge: {
         style: {
-          labelBackground: true,
+          // labelBackground: true,
           endArrow: true,
           labelText: (d) => d['label'] as string,
+          loop: true,
         },
       },
       layout: {

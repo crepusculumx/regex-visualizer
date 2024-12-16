@@ -1,6 +1,6 @@
 
 <app-dfa-input (dfaChange)="inputDfa$.next($event)"></app-dfa-input>
-<nz-collapse nzAccordion >
+<nz-collapse>
     <nz-collapse-panel  nzHeader="待最小化的DFA" [nzActive]="true">
       <app-fa-graph [data$]="inputDfaG6$"></app-fa-graph>
     </nz-collapse-panel>
@@ -8,7 +8,7 @@
 
 <!--    使用*ngIf强制生成新组件-->
       <nz-collapse  *ngIf="hopcroftLog$ | async as hopcroftLog" nzAccordion >
-        <nz-collapse-panel *ngFor="let log of hopcroftLog.hopcroftSplitLogs ; let key = index "  [nzHeader]="'第' + key +'次' " [nzActive]="true">
+        <nz-collapse-panel *ngFor="let log of hopcroftLog.hopcroftSplitLogs ; let key = index "  [nzHeader]="'第' + (key + 1).toString() +'次' " [nzActive]="true">
           <app-hopcroft-graph  [hopcroftSplitLog]="log" [flatDfa]="inputDfa()!"></app-hopcroft-graph>
         </nz-collapse-panel>
       </nz-collapse>

@@ -44,7 +44,7 @@
       <tbody>
         @for (row of dfaTableInput.rows; track $index) {
           <tr></tr>
-          <td nzLeft>{{ $index }}</td>
+          <td nzLeft>{{ row.stateId$ | async }}</td>
           <td>
             <label
               nz-radio
@@ -66,6 +66,7 @@
                 [ngModel]="transTableInput$ | async"
                 [nzStep]="1"
                 [nzMin]="0"
+                [nzMax]="dfaTableInput.rows.length - 1"
                 (ngModelChange)="transTableInput$.next($event)"
                 style="width: 100%"
               ></nz-input-number>

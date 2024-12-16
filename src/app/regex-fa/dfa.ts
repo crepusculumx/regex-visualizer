@@ -20,6 +20,29 @@ export interface FlatDfa {
   f: StateId[];
 }
 
+/**
+ * Check if dfa is legal, true for legal
+ * @param flatDfa
+ */
+export function checkFlatDfa(flatDfa: FlatDfa): boolean {
+  const states = new Set(flatDfa.dfaTable.states);
+  function checkExistState(state: number) {
+    if (!states.has(state)) {
+      console.error(`checkFlatDfa: no such state ${state}`);
+    }
+    return states.has(state);
+  }
+  checkExistState(flatDfa.s);
+  for (const f of flatDfa.f) {
+    checkExistState(f);
+  }
+  for (const flatEdge of flatDfa.dfaTable.flatEdges) {
+    checkExistState(flatEdge.source);
+    checkExistState(flatEdge.target);
+  }
+  return true;
+}
+
 export function toG6NodeId(stateId: number) {
   return `node-${stateId}`;
 }

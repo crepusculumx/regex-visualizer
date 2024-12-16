@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import {
   BehaviorSubject,
   combineLatest,
+  filter,
   map,
   Observable,
   shareReplay,
@@ -18,7 +19,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 
 import { StateId, Terminal } from '../../regex-fa/regex-fa';
-import { FlatDfa } from '../../regex-fa/dfa';
+import { checkFlatDfa, FlatDfa } from '../../regex-fa/dfa';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 
 interface DfaTableRowParam {
@@ -222,9 +223,9 @@ export class DfaInputComponent {
       if (res.s === -1) {
         res.s = res.dfaTable.states[0];
       }
-
       return res;
     }),
+    filter(checkFlatDfa),
     shareReplay(1),
   );
 
