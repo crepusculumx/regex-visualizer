@@ -1,26 +1,30 @@
 <nz-card>
   <nz-space style="width: 100%">
-    <nz-input-number-group *nzSpaceItem nzAddOnBefore="总状态数">
+
       <nz-input-number
         [ngModel]="statesSize$ | async"
         [nzStep]="1"
         [nzMin]="1"
         (ngModelChange)="statesSize$.next($event)"
-      ></nz-input-number>
-    </nz-input-number-group>
+      >
+        <span nzInputAddonBefore>总状态数</span>
+      </nz-input-number>
 
-    <nz-input-number-group *nzSpaceItem nzAddOnBefore="终结符数">
+
+
       <nz-input-number
         [ngModel]="terminalsSize$ | async"
         [nzStep]="1"
         (ngModelChange)="terminalsSize$.next($event)"
         [nzMin]="1"
-      ></nz-input-number>
-    </nz-input-number-group>
+      >
+        <span nzInputAddonBefore>终结符数</span>
+      </nz-input-number>
+
   </nz-space>
 
   @if (dfaTableInputs$ | async; as dfaTableInput) {
-    <nz-table #groupingTable [nzData]="[{}]" [nzShowPagination]="false">
+    <nz-table [nzData]="[{}]" [nzShowPagination]="false">
       <thead>
       <tr>
         <th rowspan="2" nzLeft>状态</th>
