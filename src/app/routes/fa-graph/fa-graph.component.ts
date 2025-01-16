@@ -15,7 +15,6 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 
 @Component({
   selector: 'app-fa-graph',
-  standalone: true,
   imports: [NzCardModule],
   templateUrl: './fa-graph.component.html',
   styleUrl: './fa-graph.component.less',

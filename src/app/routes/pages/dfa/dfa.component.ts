@@ -7,7 +7,6 @@ import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-dfa',
-  standalone: true,
   imports: [DfaInputComponent, FaGraphComponent, AsyncPipe],
   templateUrl: './dfa.component.html',
   styleUrl: './dfa.component.less',

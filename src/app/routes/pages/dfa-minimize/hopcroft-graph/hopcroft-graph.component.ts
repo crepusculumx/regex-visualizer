@@ -19,7 +19,6 @@ import { NzCardComponent } from 'ng-zorro-antd/card';
 
 @Component({
   selector: 'app-hopcroft-graph',
-  standalone: true,
   imports: [NzCardComponent],
   templateUrl: './hopcroft-graph.component.html',
   styleUrl: './hopcroft-graph.component.less',

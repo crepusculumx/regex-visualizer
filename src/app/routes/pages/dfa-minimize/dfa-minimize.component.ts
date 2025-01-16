@@ -12,7 +12,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-dfa-minimize',
-  standalone: true,
   imports: [
     DfaInputComponent,
     FaGraphComponent,

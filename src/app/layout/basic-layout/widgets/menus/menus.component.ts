@@ -7,7 +7,6 @@ import { Menus } from '../../../interfaces/menu';
 
 @Component({
   selector: 'app-layout-menus',
-  standalone: true,
   imports: [CommonModule, NzMenuModule, NzIconModule, RouterLink],
   templateUrl: './menus.component.html',
   styleUrl: './menus.component.less',
