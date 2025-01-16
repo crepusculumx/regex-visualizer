@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { MenusComponent } from './widgets/menus/menus.component';
@@ -20,7 +20,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
     RouterOutlet,
     MenusComponent,
     RouterLink,
-    NgOptimizedImage,
     NzResizableModule,
   ],
   templateUrl: './basic-layout.component.html',
