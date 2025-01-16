@@ -53,7 +53,6 @@ interface DfaTableInputs {
 
 @Component({
   selector: 'app-dfa-input',
-  standalone: true,
   imports: [
     NzCardComponent,
     NzInputModule,

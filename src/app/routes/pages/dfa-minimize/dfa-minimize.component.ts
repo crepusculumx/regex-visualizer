@@ -4,7 +4,6 @@ import { FaGraphComponent } from '../../fa-graph/fa-graph.component';
 import { map, ReplaySubject, switchMap } from 'rxjs';
 import { FlatDfa, toG6GraphData } from '../../../regex-fa/dfa';
 import { RegexFaWasmService } from '../../../services/regex-fa-wasm.service';
-import { NzCardComponent } from 'ng-zorro-antd/card';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
 import { HopcroftGraphComponent } from './hopcroft-graph/hopcroft-graph.component';
@@ -12,11 +11,9 @@ import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-dfa-minimize',
-  standalone: true,
   imports: [
     DfaInputComponent,
     FaGraphComponent,
-    NzCardComponent,
     NzCollapseModule,
     AsyncPipe,
     HopcroftGraphComponent,
