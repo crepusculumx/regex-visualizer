@@ -1,6 +1,6 @@
 import { Component, Output } from '@angular/core';
 import { NzCardComponent } from 'ng-zorro-antd/card';
-import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+import { NzInputNumberLegacyModule } from 'ng-zorro-antd/input-number-legacy';
 import { FormsModule } from '@angular/forms';
 import {
   BehaviorSubject,
@@ -56,7 +56,7 @@ interface DfaTableInputs {
   imports: [
     NzCardComponent,
     NzInputModule,
-    NzInputNumberModule,
+    NzInputNumberLegacyModule,
     NzCheckboxModule,
     NzSpaceModule,
     NzTableModule,
