@@ -1,55 +1,52 @@
-import { StateId, Terminal } from './regex-fa';
-import { GraphData, NodeData } from '@antv/g6';
+import { StateId } from './regex-fa';
 import { FlatEdges } from './flatEdge';
+import { toG6NodeId } from './dfa';
+import { GraphData, NodeData } from '@antv/g6';
 
-export interface FlatDfaTable {
+export interface FlatNfaTable {
   states: StateId[];
   flatEdges: FlatEdges;
 }
 
-export interface FlatDfa {
-  dfaTable: FlatDfaTable;
+export interface FlatNfa {
+  nfaTable: FlatNfaTable;
   s: StateId;
   f: StateId[];
 }
 
 /**
- * Check if dfa is legal, true for legal
- * @param flatDfa
+ * Check if nfa is legal, true for legal
+ * @param flatNfa
  */
-export function checkFlatDfa(flatDfa: FlatDfa): boolean {
-  const states = new Set(flatDfa.dfaTable.states);
+export function checkFlatNfa(flatNfa: FlatNfa): boolean {
+  const states = new Set(flatNfa.nfaTable.states);
   function checkExistState(state: number) {
     if (!states.has(state)) {
-      console.error(`checkFlatDfa: no such state ${state}`);
+      console.error(`checkFlatNfa: no such state ${state}`);
     }
     return states.has(state);
   }
-  checkExistState(flatDfa.s);
-  for (const f of flatDfa.f) {
+  checkExistState(flatNfa.s);
+  for (const f of flatNfa.f) {
     checkExistState(f);
   }
-  for (const flatEdge of flatDfa.dfaTable.flatEdges) {
+  for (const flatEdge of flatNfa.nfaTable.flatEdges) {
     checkExistState(flatEdge.source);
     checkExistState(flatEdge.target);
   }
   return true;
 }
 
-export function toG6NodeId(stateId: number) {
-  return `node-${stateId}`;
-}
-
-export function toG6GraphData(flatDfa: FlatDfa) {
-  const f = new Set<number>(flatDfa.f);
+export function nfaToG6GraphData(flatNfa: FlatNfa) {
+  const f = new Set<number>(flatNfa.f);
 
   // 当没有节点时，添加一个虚拟起点
-  if (flatDfa.dfaTable.states.length == 0) {
-    flatDfa.dfaTable.states.push(0);
+  if (flatNfa.nfaTable.states.length == 0) {
+    flatNfa.nfaTable.states.push(0);
   }
 
   const graphData: GraphData = {
-    nodes: flatDfa.dfaTable.states.map((stateId) => {
+    nodes: flatNfa.nfaTable.states.map((stateId) => {
       let node: NodeData = {
         id: toG6NodeId(stateId),
         label: stateId.toString(),
@@ -88,7 +85,7 @@ export function toG6GraphData(flatDfa: FlatDfa) {
       }
       return node;
     }),
-    edges: flatDfa.dfaTable.flatEdges.map(
+    edges: flatNfa.nfaTable.flatEdges.map(
       ({ source, target, terminal }, index) => {
         return {
           id: 'edge-' + index.toString(),
@@ -117,31 +114,8 @@ export function toG6GraphData(flatDfa: FlatDfa) {
   graphData.edges!.push({
     id: 'edge-S',
     source: 'node-S',
-    target: 'node-' + flatDfa.s.toString(),
+    target: 'node-' + flatNfa.s.toString(),
   });
 
   return graphData;
-}
-
-export interface HopcroftSplit {
-  splitId: StateId;
-  states: StateId[];
-}
-
-export interface HopcroftFlatSplitTable {
-  splits: HopcroftSplit[];
-}
-
-export interface HopcroftSplitLog {
-  splitTerminal: Terminal;
-  source: HopcroftFlatSplitTable;
-  target: HopcroftFlatSplitTable;
-  split: HopcroftSplit;
-  newSplits: HopcroftSplit[];
-}
-
-export interface HopcroftLog {
-  source: FlatDfa;
-  target: FlatDfa;
-  hopcroftSplitLogs: HopcroftSplitLog[];
 }
