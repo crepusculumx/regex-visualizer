@@ -15,8 +15,7 @@
       <div class="sider-resize-line"></div>
     </nz-resize-handle>
     <div class="sidebar-logo">
-      <a routerLink="/">
-      </a>
+      <a routerLink="/"> </a>
     </div>
     @if (menus(); as menus) {
       <app-layout-menus [menus]="menus"></app-layout-menus>
@@ -25,7 +24,10 @@
   <nz-layout class="right-layout">
     <nz-header>
       <div class="app-header">
-        <button class="header-trigger" (click)="isCollapsed.set(!isCollapsed())">
+        <button
+          class="header-trigger"
+          (click)="isCollapsed.set(!isCollapsed())"
+        >
           <i
             class="trigger"
             nz-icon

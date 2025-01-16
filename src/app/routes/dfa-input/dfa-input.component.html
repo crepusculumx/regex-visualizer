@@ -1,49 +1,45 @@
 <nz-card>
   <nz-space style="width: 100%">
+    <nz-input-number
+      [ngModel]="statesSize$ | async"
+      [nzStep]="1"
+      [nzMin]="1"
+      (ngModelChange)="statesSize$.next($event)"
+    >
+      <span nzInputAddonBefore>总状态数</span>
+    </nz-input-number>
 
-      <nz-input-number
-        [ngModel]="statesSize$ | async"
-        [nzStep]="1"
-        [nzMin]="1"
-        (ngModelChange)="statesSize$.next($event)"
-      >
-        <span nzInputAddonBefore>总状态数</span>
-      </nz-input-number>
-
-
-
-      <nz-input-number
-        [ngModel]="terminalsSize$ | async"
-        [nzStep]="1"
-        (ngModelChange)="terminalsSize$.next($event)"
-        [nzMin]="1"
-      >
-        <span nzInputAddonBefore>终结符数</span>
-      </nz-input-number>
-
+    <nz-input-number
+      [ngModel]="terminalsSize$ | async"
+      [nzStep]="1"
+      (ngModelChange)="terminalsSize$.next($event)"
+      [nzMin]="1"
+    >
+      <span nzInputAddonBefore>终结符数</span>
+    </nz-input-number>
   </nz-space>
 
   @if (dfaTableInputs$ | async; as dfaTableInput) {
     <nz-table [nzData]="[{}]" [nzShowPagination]="false">
       <thead>
-      <tr>
-        <th rowspan="2" nzLeft>状态</th>
-        <th rowspan="2">开始状态</th>
-        <th rowspan="2">终止状态</th>
-        <th [colspan]="terminalsSize$ | async">输入字符</th>
-      </tr>
-      <tr>
-        @for (terminalInput$ of dfaTableInput.terminals; track $index) {
-          <th rowSpan="1">
-            <input
-              type="text"
-              nz-input
-              [ngModel]="terminalInput$ | async"
-              (ngModelChange)="terminalInput$.next($event)"
-            />
-          </th>
-        }
-      </tr>
+        <tr>
+          <th rowspan="2" nzLeft>状态</th>
+          <th rowspan="2">开始状态</th>
+          <th rowspan="2">终止状态</th>
+          <th [colspan]="terminalsSize$ | async">输入字符</th>
+        </tr>
+        <tr>
+          @for (terminalInput$ of dfaTableInput.terminals; track $index) {
+            <th rowSpan="1">
+              <input
+                type="text"
+                nz-input
+                [ngModel]="terminalInput$ | async"
+                (ngModelChange)="terminalInput$.next($event)"
+              />
+            </th>
+          }
+        </tr>
       </thead>
       <tbody>
         @for (row of dfaTableInput.rows; track $index) {

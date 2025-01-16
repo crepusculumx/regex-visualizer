@@ -17,10 +17,6 @@ module.exports = tseslint.config(
     ],
     processor: angular.processInlineTemplates,
     rules: {
-
-
-
-
       "@angular-eslint/directive-selector": [
         "error",
         {
@@ -41,10 +37,11 @@ module.exports = tseslint.config(
     },
   },
   {
-    files: ["**/*.html"],
+    files: ["**/*.component.html"],
     extends: [
       ...angular.configs.templateRecommended,
       ...angular.configs.templateAccessibility,
+      eslintPluginPrettierRecommended
     ],
     rules: {
       "@angular-eslint/template/label-has-associated-control": "off",
