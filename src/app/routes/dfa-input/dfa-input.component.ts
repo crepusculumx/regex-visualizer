@@ -188,15 +188,13 @@ export class DfaInputComponent {
   flatDfa$: Observable<FlatDfa> = this.dfaTableParams$.pipe(
     map((dfaTableParams) => {
       const res: FlatDfa = {
-        dfaTable: {
-          states: [],
-          flatEdges: [],
-        },
+        states: [],
+        flatEdges: [],
         f: [],
         s: -1,
       };
       for (const row of dfaTableParams.rows) {
-        res.dfaTable.states.push(row.stateId);
+        res.states.push(row.stateId);
         if (row.isS) {
           res.s = row.stateId;
         }
@@ -211,7 +209,7 @@ export class DfaInputComponent {
             dfaTableParams.terminals[i] !== null &&
             dfaTableParams.terminals[i] !== ''
           ) {
-            res.dfaTable.flatEdges.push({
+            res.flatEdges.push({
               source: row.stateId,
               target: row.transTable[i]!,
               terminal: dfaTableParams.terminals[i]!,
@@ -220,7 +218,7 @@ export class DfaInputComponent {
         }
       }
       if (res.s === -1) {
-        res.s = res.dfaTable.states[0];
+        res.s = res.states[0];
       }
       return res;
     }),

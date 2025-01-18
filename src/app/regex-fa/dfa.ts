@@ -2,13 +2,9 @@ import { StateId, Terminal } from './regex-fa';
 import { GraphData, NodeData } from '@antv/g6';
 import { FlatEdges } from './flatEdge';
 
-export interface FlatDfaTable {
+export interface FlatDfa {
   states: StateId[];
   flatEdges: FlatEdges;
-}
-
-export interface FlatDfa {
-  dfaTable: FlatDfaTable;
   s: StateId;
   f: StateId[];
 }
@@ -18,7 +14,7 @@ export interface FlatDfa {
  * @param flatDfa
  */
 export function checkFlatDfa(flatDfa: FlatDfa): boolean {
-  const states = new Set(flatDfa.dfaTable.states);
+  const states = new Set(flatDfa.states);
   function checkExistState(state: number) {
     if (!states.has(state)) {
       console.error(`checkFlatDfa: no such state ${state}`);
@@ -29,7 +25,7 @@ export function checkFlatDfa(flatDfa: FlatDfa): boolean {
   for (const f of flatDfa.f) {
     checkExistState(f);
   }
-  for (const flatEdge of flatDfa.dfaTable.flatEdges) {
+  for (const flatEdge of flatDfa.flatEdges) {
     checkExistState(flatEdge.source);
     checkExistState(flatEdge.target);
   }
@@ -44,12 +40,12 @@ export function toG6GraphData(flatDfa: FlatDfa) {
   const f = new Set<number>(flatDfa.f);
 
   // 当没有节点时，添加一个虚拟起点
-  if (flatDfa.dfaTable.states.length == 0) {
-    flatDfa.dfaTable.states.push(0);
+  if (flatDfa.states.length == 0) {
+    flatDfa.states.push(0);
   }
 
   const graphData: GraphData = {
-    nodes: flatDfa.dfaTable.states.map((stateId) => {
+    nodes: flatDfa.states.map((stateId) => {
       let node: NodeData = {
         id: toG6NodeId(stateId),
         label: stateId.toString(),
@@ -88,17 +84,15 @@ export function toG6GraphData(flatDfa: FlatDfa) {
       }
       return node;
     }),
-    edges: flatDfa.dfaTable.flatEdges.map(
-      ({ source, target, terminal }, index) => {
-        return {
-          id: 'edge-' + index.toString(),
-          source: 'node-' + source.toString(),
-          target: 'node-' + target.toString(),
-          label: terminal,
-          type: source == target ? 'loop' : undefined,
-        };
-      },
-    ),
+    edges: flatDfa.flatEdges.map(({ source, target, terminal }, index) => {
+      return {
+        id: 'edge-' + index.toString(),
+        source: 'node-' + source.toString(),
+        target: 'node-' + target.toString(),
+        label: terminal,
+        type: source == target ? 'loop' : undefined,
+      };
+    }),
   };
 
   graphData.nodes!.push({
