@@ -1,23 +1,40 @@
-import { StateId, Terminal } from './regex-fa';
+import { FlatEdges, StateId, States, Terminal } from './regex-fa';
 import { GraphData, NodeData } from '@antv/g6';
 
-export interface FlatEdge {
-  source: StateId;
-  target: StateId;
-  terminal: Terminal;
-}
-
-export type FlatEdges = FlatEdge[];
-
-export interface FlatDfaTable {
-  states: StateId[];
-  flatEdges: FlatEdge[];
-}
-
 export interface FlatDfa {
-  dfaTable: FlatDfaTable;
+  states: StateId[];
+  flatEdges: FlatEdges;
   s: StateId;
   f: StateId[];
+}
+
+export type DfaTransTable = Map<Terminal, StateId>;
+export type DfaTable = Map<StateId, DfaTransTable>;
+
+export class Dfa {
+  dfaTable: DfaTable = new Map<StateId, DfaTransTable>();
+  s: StateId;
+  f: States;
+
+  flatDfa: FlatDfa;
+
+  constructor(flatDfa: FlatDfa) {
+    this.flatDfa = flatDfa;
+    this.s = flatDfa.s;
+    this.f = new Set<StateId>(flatDfa.f);
+    for (const state of flatDfa.states) {
+      this.dfaTable.set(state, new Map<Terminal, StateId>());
+    }
+    for (const flatEdge of flatDfa.flatEdges) {
+      this.dfaTable
+        .get(flatEdge.source)!
+        .set(flatEdge.terminal, flatEdge.target);
+    }
+  }
+
+  getTerminals() {
+    return [...new Set(this.flatDfa.flatEdges.map((edge) => edge.terminal))];
+  }
 }
 
 /**
@@ -25,7 +42,7 @@ export interface FlatDfa {
  * @param flatDfa
  */
 export function checkFlatDfa(flatDfa: FlatDfa): boolean {
-  const states = new Set(flatDfa.dfaTable.states);
+  const states = new Set(flatDfa.states);
   function checkExistState(state: number) {
     if (!states.has(state)) {
       console.error(`checkFlatDfa: no such state ${state}`);
@@ -36,7 +53,7 @@ export function checkFlatDfa(flatDfa: FlatDfa): boolean {
   for (const f of flatDfa.f) {
     checkExistState(f);
   }
-  for (const flatEdge of flatDfa.dfaTable.flatEdges) {
+  for (const flatEdge of flatDfa.flatEdges) {
     checkExistState(flatEdge.source);
     checkExistState(flatEdge.target);
   }
@@ -51,12 +68,12 @@ export function toG6GraphData(flatDfa: FlatDfa) {
   const f = new Set<number>(flatDfa.f);
 
   // 当没有节点时，添加一个虚拟起点
-  if (flatDfa.dfaTable.states.length == 0) {
-    flatDfa.dfaTable.states.push(0);
+  if (flatDfa.states.length == 0) {
+    flatDfa.states.push(0);
   }
 
   const graphData: GraphData = {
-    nodes: flatDfa.dfaTable.states.map((stateId) => {
+    nodes: flatDfa.states.map((stateId) => {
       let node: NodeData = {
         id: toG6NodeId(stateId),
         label: stateId.toString(),
@@ -95,17 +112,15 @@ export function toG6GraphData(flatDfa: FlatDfa) {
       }
       return node;
     }),
-    edges: flatDfa.dfaTable.flatEdges.map(
-      ({ source, target, terminal }, index) => {
-        return {
-          id: 'edge-' + index.toString(),
-          source: 'node-' + source.toString(),
-          target: 'node-' + target.toString(),
-          label: terminal,
-          type: source == target ? 'loop' : undefined,
-        };
-      },
-    ),
+    edges: flatDfa.flatEdges.map(({ source, target, terminal }, index) => {
+      return {
+        id: 'edge-' + index.toString(),
+        source: 'node-' + source.toString(),
+        target: 'node-' + target.toString(),
+        label: terminal,
+        type: source == target ? 'loop' : undefined,
+      };
+    }),
   };
 
   graphData.nodes!.push({

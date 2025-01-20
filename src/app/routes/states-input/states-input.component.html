@@ -1,0 +1,11 @@
+<nz-input-group nzAddOnBefore="[" nzAddOnAfter="]">
+  <input
+    type="text"
+    nz-input
+    [ngModel]="statesStr$ | async"
+    (ngModelChange)="onStatesChange($event)"
+    (blur)="onBlur()"
+    style="width: 100%"
+    placeholder="逗号隔开"
+  />
+</nz-input-group>

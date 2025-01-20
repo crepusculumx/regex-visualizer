@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { AsyncSubject, map } from 'rxjs';
+import { AsyncSubject, map, Observable } from 'rxjs';
 import { FlatDfa, HopcroftLog } from '../regex-fa/dfa';
+import { FlatNfa, ScLog } from '../regex-fa/nfa';
 
 // eslint-disable-next-line
 declare const Module: any;
@@ -24,14 +25,23 @@ export class RegexFaWasmService {
     };
   }
 
-  dfaMinimize$(flatDfa: FlatDfa) {
+  libCall<Input, Output>(funcName: string, args: Input): Observable<Output> {
     return this.libCall$.pipe(
       map((func) => {
-        const args = JSON.stringify(flatDfa);
-        const res = func('DfaMinimize', args);
-        const resDFa: HopcroftLog = JSON.parse(res);
-        return resDFa;
+        const argsStr = JSON.stringify(args);
+        // console.log(argsStr);
+        const resStr = func(funcName, argsStr);
+        const res = JSON.parse(resStr) as Output;
+        return res;
       }),
     );
+  }
+
+  dfaMinimize$(flatDfa: FlatDfa) {
+    return this.libCall<FlatDfa, HopcroftLog>('DfaMinimize', flatDfa);
+  }
+
+  nfaToDfa$(flatNfa: FlatNfa) {
+    return this.libCall<FlatNfa, ScLog>('NfaToDfa', flatNfa);
   }
 }

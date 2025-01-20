@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { DfaInputComponent } from '../../dfa-input/dfa-input.component';
 import { FaGraphComponent } from '../../fa-graph/fa-graph.component';
-import { map, ReplaySubject, switchMap } from 'rxjs';
+import { map, ReplaySubject, shareReplay, switchMap } from 'rxjs';
 import { FlatDfa, toG6GraphData } from '../../../regex-fa/dfa';
 import { RegexFaWasmService } from '../../../services/regex-fa-wasm.service';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
 import { HopcroftGraphComponent } from './hopcroft-graph/hopcroft-graph.component';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { FaTableComponent } from '../../fa-table/fa-table.component';
 
 @Component({
   selector: 'app-dfa-minimize',
@@ -19,6 +20,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
     HopcroftGraphComponent,
     NgIf,
     NgForOf,
+    FaTableComponent,
   ],
   templateUrl: './dfa-minimize.component.html',
   styleUrl: './dfa-minimize.component.less',
@@ -33,18 +35,28 @@ export class DfaMinimizeComponent {
     map((flatDfa) => {
       return toG6GraphData(flatDfa);
     }),
+    shareReplay(1),
   );
 
   hopcroftLog$ = this.inputDfa$.pipe(
     switchMap((inputDfa) => {
       return this.regexService.dfaMinimize$(inputDfa);
     }),
+    shareReplay(1),
   );
 
-  minimizeDfaG6$ = this.hopcroftLog$.pipe(
+  minimizeDfa$ = this.hopcroftLog$.pipe(
     map((hopcroftLog) => {
-      return toG6GraphData(hopcroftLog.target);
+      return hopcroftLog.target;
     }),
+    shareReplay(1),
+  );
+
+  minimizeDfaG6$ = this.minimizeDfa$.pipe(
+    map((flatDfa) => {
+      return toG6GraphData(flatDfa);
+    }),
+    shareReplay(1),
   );
   protected readonly JSON = JSON;
 }

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import {
   BehaviorSubject,
   combineLatest,
+  distinctUntilChanged,
   filter,
   map,
   Observable,
@@ -17,42 +18,42 @@ import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
-
 import { StateId, Terminal } from '../../regex-fa/regex-fa';
-import { checkFlatDfa, FlatDfa } from '../../regex-fa/dfa';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
+import { checkFlatNfa, FlatNfa } from '../../regex-fa/nfa';
+import { StatesInputComponent } from '../states-input/states-input.component';
 
-interface DfaTableRowParam {
+interface tableRowParam {
   stateId: StateId;
   isS: boolean;
   isF: boolean;
-  transTable: (number | null)[];
+  transTable: (number[] | null)[];
 }
 
-interface DfaTableParams {
+interface tableParams {
   statesSize: number;
   terminalsSize: number;
   terminals: (Terminal | null)[];
-  rows: DfaTableRowParam[];
+  rows: tableRowParam[];
 }
 
-interface DfaTableRowParamInputs {
+interface tableRowParamInputs {
   stateId$: BehaviorSubject<StateId>;
   isS$: Observable<boolean>;
   isF$: BehaviorSubject<boolean>;
-  transTable: BehaviorSubject<number | null>[];
+  transTable: BehaviorSubject<number[] | null>[];
 }
 
-interface DfaTableInputs {
+interface tableInputs {
   statesSize: number;
   terminalsSize: number;
   terminals: BehaviorSubject<Terminal | null>[];
-  rows: DfaTableRowParamInputs[];
+  rows: tableRowParamInputs[];
   s$: BehaviorSubject<number>;
 }
 
 @Component({
-  selector: 'app-dfa-input',
+  selector: 'app-nfa-input',
   imports: [
     NzCardComponent,
     NzInputModule,
@@ -63,13 +64,14 @@ interface DfaTableInputs {
     FormsModule,
     AsyncPipe,
     NzRadioModule,
+    StatesInputComponent,
   ],
-  templateUrl: './dfa-input.component.html',
-  styleUrl: './dfa-input.component.less',
+  templateUrl: './nfa-input.component.html',
+  styleUrl: './nfa-input.component.less',
 })
-export class DfaInputComponent {
+export class NfaInputComponent {
   // When the number of rows changes, retain the filled in content.
-  private dfaTableParams: DfaTableParams = {
+  private tableParams: tableParams = {
     rows: [],
     statesSize: 1,
     terminalsSize: 1,
@@ -79,24 +81,24 @@ export class DfaInputComponent {
   statesSize$ = new BehaviorSubject<number>(1);
   terminalsSize$ = new BehaviorSubject<number>(1);
 
-  dfaTableInputs$: Observable<DfaTableInputs> = combineLatest([
+  tableInputs$: Observable<tableInputs> = combineLatest([
     this.statesSize$,
     this.terminalsSize$,
   ]).pipe(
-    // Resize this.dfaTableParams
+    // Resize this.tableParams
     tap(([statesSize, terminalsSize]) => {
-      this.dfaTableParams.statesSize = statesSize;
-      this.dfaTableParams.terminalsSize = terminalsSize;
-      while (this.dfaTableParams.rows.length > statesSize) {
-        this.dfaTableParams.rows.pop();
+      this.tableParams.statesSize = statesSize;
+      this.tableParams.terminalsSize = terminalsSize;
+      while (this.tableParams.rows.length > statesSize) {
+        this.tableParams.rows.pop();
       }
-      while (this.dfaTableParams.terminals.length > terminalsSize) {
-        this.dfaTableParams.terminals.pop();
+      while (this.tableParams.terminals.length > terminalsSize) {
+        this.tableParams.terminals.pop();
       }
     }),
-    // Build new DfaTableInputs
+    // Build new tableInputs
     map(([statesSize, terminalsSize]) => {
-      const res: DfaTableInputs = {
+      const res: tableInputs = {
         statesSize: statesSize,
         terminalsSize: terminalsSize,
         rows: [],
@@ -107,18 +109,18 @@ export class DfaInputComponent {
       for (let i = 0; i < terminalsSize; i++) {
         res.terminals.push(
           new BehaviorSubject(
-            this.dfaTableParams.terminals.length > i
-              ? this.dfaTableParams.terminals[i]
+            this.tableParams.terminals.length > i
+              ? this.tableParams.terminals[i]
               : null,
           ),
         );
       }
 
       for (let i = 0; i < statesSize; i++) {
-        const dfaRowInput: DfaTableRowParamInputs = {
+        const rowInput: tableRowParamInputs = {
           isF$: new BehaviorSubject<boolean>(
-            this.dfaTableParams.rows.length > i
-              ? this.dfaTableParams.rows[i].isF
+            this.tableParams.rows.length > i
+              ? this.tableParams.rows[i].isF
               : false,
           ),
           isS$: res.s$.pipe(
@@ -131,69 +133,81 @@ export class DfaInputComponent {
         };
 
         for (let j = 0; j < terminalsSize; j++) {
-          dfaRowInput.transTable.push(
-            new BehaviorSubject<number | null>(
-              this.dfaTableParams.rows.length > i &&
-              this.dfaTableParams.rows[i].transTable.length > j
-                ? this.dfaTableParams.rows[i].transTable[j]
+          rowInput.transTable.push(
+            new BehaviorSubject<number[] | null>(
+              this.tableParams.rows.length > i &&
+              this.tableParams.rows[i].transTable.length > j
+                ? this.tableParams.rows[i].transTable[j]!
                 : null,
             ),
           );
         }
-
-        res.rows.push(dfaRowInput);
+        res.rows.push(rowInput);
       }
       return res;
     }),
     shareReplay(1),
   );
 
-  dfaTableParams$ = this.dfaTableInputs$.pipe(
-    switchMap((dfaTableInputs) => {
+  tableParams$ = this.tableInputs$.pipe(
+    switchMap((tableInputs) => {
       const terminals$ = combineLatest<(string | null)[]>(
-        dfaTableInputs.terminals,
-      );
+        tableInputs.terminals,
+      ).pipe(distinctUntilChanged(), shareReplay(1));
       const rows$ = combineLatest(
-        dfaTableInputs.rows.map((dfaTableRowParamInputs) => {
+        tableInputs.rows.map((tableRowParamInputs) => {
           return combineLatest([
-            dfaTableRowParamInputs.stateId$,
-            dfaTableRowParamInputs.isS$,
-            dfaTableRowParamInputs.isF$,
-            combineLatest(dfaTableRowParamInputs.transTable),
+            tableRowParamInputs.stateId$,
+            tableRowParamInputs.isS$,
+            tableRowParamInputs.isF$,
+            combineLatest(tableRowParamInputs.transTable).pipe(
+              distinctUntilChanged(),
+              shareReplay(1),
+            ),
           ]).pipe(
-            map(([stateId, isS, isF, transTable]): DfaTableRowParam => {
-              return { isF, isS, stateId, transTable };
+            map(([stateId, isS, isF, transTable]): tableRowParam => {
+              return {
+                isF,
+                isS,
+                stateId,
+                transTable,
+              };
             }),
+            distinctUntilChanged(),
+            shareReplay(1),
           );
         }),
       );
 
       return combineLatest([terminals$, rows$]).pipe(
-        map(([terminals, rows]): DfaTableParams => {
+        map(([terminals, rows]): tableParams => {
           return {
             rows: rows,
-            statesSize: dfaTableInputs.statesSize,
+            statesSize: tableInputs.statesSize,
             terminals: terminals,
-            terminalsSize: dfaTableInputs.terminalsSize,
+            terminalsSize: tableInputs.terminalsSize,
           };
         }),
+        distinctUntilChanged(),
+        shareReplay(1),
       );
     }),
-    tap((dfaTableParams) => {
-      this.dfaTableParams = dfaTableParams;
+    tap((nfaTableParams) => {
+      this.tableParams = nfaTableParams;
     }),
+    distinctUntilChanged(),
     shareReplay(1),
   );
 
-  flatDfa$: Observable<FlatDfa> = this.dfaTableParams$.pipe(
-    map((dfaTableParams) => {
-      const res: FlatDfa = {
+  flatNfa$: Observable<FlatNfa> = this.tableParams$.pipe(
+    map((nfaTableParams) => {
+      const res: FlatNfa = {
         states: [],
         flatEdges: [],
         f: [],
         s: -1,
       };
-      for (const row of dfaTableParams.rows) {
+      for (const row of nfaTableParams.rows) {
         res.states.push(row.stateId);
         if (row.isS) {
           res.s = row.stateId;
@@ -203,17 +217,18 @@ export class DfaInputComponent {
         }
         for (let i = 0; i < row.transTable.length; i++) {
           if (
-            typeof row.transTable[i] === 'number' && // antd bug, number-input get '' when enpty
             row.transTable[i] !== null &&
             row.transTable[i] !== undefined &&
-            dfaTableParams.terminals[i] !== null &&
-            dfaTableParams.terminals[i] !== ''
+            nfaTableParams.terminals[i] !== null &&
+            nfaTableParams.terminals[i] !== ''
           ) {
-            res.flatEdges.push({
-              source: row.stateId,
-              target: row.transTable[i]!,
-              terminal: dfaTableParams.terminals[i]!,
-            });
+            for (const v of row.transTable[i]!) {
+              res.flatEdges.push({
+                source: row.stateId,
+                target: v,
+                terminal: nfaTableParams.terminals[i]!,
+              });
+            }
           }
         }
       }
@@ -222,9 +237,10 @@ export class DfaInputComponent {
       }
       return res;
     }),
-    filter(checkFlatDfa),
+    filter(checkFlatNfa),
+    distinctUntilChanged(),
     shareReplay(1),
   );
 
-  @Output() dfaChange = this.flatDfa$;
+  @Output() nfaChange = this.flatNfa$;
 }
