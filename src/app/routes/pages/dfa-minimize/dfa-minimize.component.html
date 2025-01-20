@@ -21,4 +21,7 @@
   <nz-collapse-panel nzHeader="最小化后的DFA" [nzActive]="true">
     <app-fa-graph [data$]="minimizeDfaG6$"></app-fa-graph>
   </nz-collapse-panel>
+  <nz-collapse-panel nzHeader="最小化后的DFA的转移函数表" [nzActive]="true">
+    <app-fa-table [flatDfa$]="minimizeDfa$"></app-fa-table>
+  </nz-collapse-panel>
 </nz-collapse>

@@ -1,12 +1,40 @@
-import { StateId, Terminal } from './regex-fa';
+import { FlatEdges, StateId, States, Terminal } from './regex-fa';
 import { GraphData, NodeData } from '@antv/g6';
-import { FlatEdges } from './flatEdge';
 
 export interface FlatDfa {
   states: StateId[];
   flatEdges: FlatEdges;
   s: StateId;
   f: StateId[];
+}
+
+export type DfaTransTable = Map<Terminal, StateId>;
+export type DfaTable = Map<StateId, DfaTransTable>;
+
+export class Dfa {
+  dfaTable: DfaTable = new Map<StateId, DfaTransTable>();
+  s: StateId;
+  f: States;
+
+  flatDfa: FlatDfa;
+
+  constructor(flatDfa: FlatDfa) {
+    this.flatDfa = flatDfa;
+    this.s = flatDfa.s;
+    this.f = new Set<StateId>(flatDfa.f);
+    for (const state of flatDfa.states) {
+      this.dfaTable.set(state, new Map<Terminal, StateId>());
+    }
+    for (const flatEdge of flatDfa.flatEdges) {
+      this.dfaTable
+        .get(flatEdge.source)!
+        .set(flatEdge.terminal, flatEdge.target);
+    }
+  }
+
+  getTerminals() {
+    return [...new Set(this.flatDfa.flatEdges.map((edge) => edge.terminal))];
+  }
 }
 
 /**
