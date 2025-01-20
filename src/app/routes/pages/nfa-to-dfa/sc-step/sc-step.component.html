@@ -1,0 +1,84 @@
+@if (scStepParams$ | async; as scStepParams) {
+  <nz-slider
+    nzTooltipVisible="always"
+    [nzMin]="1"
+    [nzMax]="scStepParams.scLog.steps.length"
+    [ngModel]="p$ | async"
+    (ngModelChange)="p$.next($event)"
+  ></nz-slider>
+}
+
+@if (scStep$ | async; as scStep) {
+  <p nz-typography>
+    当前子集：[
+    {{ scStep.curSubset.join(", ") }}
+    ]
+  </p>
+  <p nz-typography>
+    当前子集的转移：
+    @if (scStep.scEdges.length === 0) {
+      无
+    }
+    @for (edge of scStep.scEdges; track $index) {
+      <p nz-typography>
+        {{ edge.terminal }}: [ {{ scStep.curSubset.join(", ") }} ]
+      </p>
+    }
+  </p>
+  <p nz-typography>
+    此次处理产生的新子集：
+    @if (scStep.newSubsets.length === 0) {
+      无
+    }
+    @for (subset of scStep.newSubsets; track $index) {
+      <p nz-typography>[ {{ subset.join(", ") }} ]</p>
+    }
+  </p>
+  <p nz-typography>
+    等待进行子集划分的队列：
+    @if (scStep.waitList.length === 0) {
+      无
+    }
+    @for (subset of scStep.waitList; track $index) {
+      <p nz-typography>[ {{ subset.join(", ") }} ]</p>
+    }
+  </p>
+}
+
+@if (tableParams$ | async; as tableParams) {
+  <nz-table [nzData]="[{}]" [nzShowPagination]="false">
+    <thead>
+      <tr>
+        <th rowspan="2" nzLeft>状态</th>
+        <th rowspan="2">开始状态</th>
+        <th rowspan="2">终止状态</th>
+        <th [colspan]="tableParams.terminalsSize">输入字符</th>
+      </tr>
+      <tr>
+        @for (terminal of tableParams.terminals; track $index) {
+          <th rowSpan="1">
+            {{ terminal }}
+          </th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of tableParams.rows; track $index) {
+        <tr></tr>
+        <td nzLeft>{{ row.state }}</td>
+        <td>
+          <label nz-radio nzDisabled [ngModel]="row.isS"></label>
+        </td>
+        <td>
+          <label nz-checkbox nzDisabled [ngModel]="row.isF"></label>
+        </td>
+
+        @for (v of row.transTable; track $index) {
+          <td>
+            {{ v }}
+          </td>
+        }
+      }
+    </tbody>
+  </nz-table>
+}

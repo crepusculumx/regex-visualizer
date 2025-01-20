@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import {
   BehaviorSubject,
   combineLatest,
+  distinctUntilChanged,
   filter,
   map,
   Observable,
@@ -152,14 +153,17 @@ export class NfaInputComponent {
     switchMap((tableInputs) => {
       const terminals$ = combineLatest<(string | null)[]>(
         tableInputs.terminals,
-      );
+      ).pipe(distinctUntilChanged(), shareReplay(1));
       const rows$ = combineLatest(
         tableInputs.rows.map((tableRowParamInputs) => {
           return combineLatest([
             tableRowParamInputs.stateId$,
             tableRowParamInputs.isS$,
             tableRowParamInputs.isF$,
-            combineLatest(tableRowParamInputs.transTable),
+            combineLatest(tableRowParamInputs.transTable).pipe(
+              distinctUntilChanged(),
+              shareReplay(1),
+            ),
           ]).pipe(
             map(([stateId, isS, isF, transTable]): tableRowParam => {
               return {
@@ -169,6 +173,8 @@ export class NfaInputComponent {
                 transTable,
               };
             }),
+            distinctUntilChanged(),
+            shareReplay(1),
           );
         }),
       );
@@ -182,26 +188,27 @@ export class NfaInputComponent {
             terminalsSize: tableInputs.terminalsSize,
           };
         }),
+        distinctUntilChanged(),
+        shareReplay(1),
       );
     }),
     tap((nfaTableParams) => {
       this.tableParams = nfaTableParams;
     }),
+    distinctUntilChanged(),
     shareReplay(1),
   );
 
   flatNfa$: Observable<FlatNfa> = this.tableParams$.pipe(
     map((nfaTableParams) => {
       const res: FlatNfa = {
-        nfaTable: {
-          states: [],
-          flatEdges: [],
-        },
+        states: [],
+        flatEdges: [],
         f: [],
         s: -1,
       };
       for (const row of nfaTableParams.rows) {
-        res.nfaTable.states.push(row.stateId);
+        res.states.push(row.stateId);
         if (row.isS) {
           res.s = row.stateId;
         }
@@ -216,7 +223,7 @@ export class NfaInputComponent {
             nfaTableParams.terminals[i] !== ''
           ) {
             for (const v of row.transTable[i]!) {
-              res.nfaTable.flatEdges.push({
+              res.flatEdges.push({
                 source: row.stateId,
                 target: v,
                 terminal: nfaTableParams.terminals[i]!,
@@ -226,11 +233,12 @@ export class NfaInputComponent {
         }
       }
       if (res.s === -1) {
-        res.s = res.nfaTable.states[0];
+        res.s = res.states[0];
       }
       return res;
     }),
     filter(checkFlatNfa),
+    distinctUntilChanged(),
     shareReplay(1),
   );
 

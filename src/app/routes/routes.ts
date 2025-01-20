@@ -4,6 +4,7 @@ import { BasicLayoutComponent } from '../layout/basic-layout/basic-layout.compon
 import { DfaComponent } from './pages/dfa/dfa.component';
 import { DfaMinimizeComponent } from './pages/dfa-minimize/dfa-minimize.component';
 import { NfaComponent } from './pages/nfa/nfa.component';
+import { NfaToDfaComponent } from './pages/nfa-to-dfa/nfa-to-dfa.component';
 
 export default [
   {
@@ -21,6 +22,10 @@ export default [
       {
         path: 'dfa-minimize',
         component: DfaMinimizeComponent,
+      },
+      {
+        path: 'nfa-to-dfa',
+        component: NfaToDfaComponent,
       },
     ],
   },

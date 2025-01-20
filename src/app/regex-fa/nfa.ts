@@ -115,9 +115,15 @@ export interface ScEdge {
 }
 
 export interface ScStep {
+  curSubset: FlatStates;
   scEdges: ScEdge[];
-  newStates: FlatStates[];
+  newSubsets: FlatStates[];
   waitList: FlatStates[];
+}
+
+export interface ScTable {
+  scStates: FlatStates[];
+  scEdges: ScEdge[];
 }
 
 export interface ScLog {

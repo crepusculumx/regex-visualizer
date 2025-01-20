@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, Output } from '@angular/core';
 import { NzInputDirective, NzInputGroupComponent } from 'ng-zorro-antd/input';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BehaviorSubject, map, timer } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, map, timer } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 
 @Component({
@@ -35,6 +35,7 @@ export class StatesInputComponent implements OnInit {
   }
 
   statesStr$ = new BehaviorSubject<string>('');
+  resStr$ = new BehaviorSubject<string>('');
   onStatesChange(input: string) {
     //通过timer(1)延迟到下一个变更检测周期
     // 否则会出现:
@@ -47,7 +48,10 @@ export class StatesInputComponent implements OnInit {
     if (input != res) {
       timer(1).subscribe(() => {
         this.statesStr$.next(res);
+        this.resStr$.next(res);
       });
+    } else {
+      this.resStr$.next(res);
     }
   }
 
@@ -56,7 +60,8 @@ export class StatesInputComponent implements OnInit {
     this.statesStr$.next(this.arrayToCommaSeparatedString(states));
   }
 
-  @Output() statesChange = this.statesStr$.pipe(
+  @Output() statesChange = this.resStr$.pipe(
+    distinctUntilChanged(),
     map((input) => {
       return this.commaSeparatedStringToArray(input);
     }),

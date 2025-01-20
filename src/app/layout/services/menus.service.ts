@@ -49,6 +49,14 @@ export class MenusService {
           disabled: false,
           routerLink: ['dfa-minimize'],
         },
+        {
+          title: 'NFA->DFA',
+          level: 2,
+          icon: '',
+          selected: false,
+          disabled: false,
+          routerLink: ['nfa-to-dfa'],
+        },
       ],
     },
   ]);
