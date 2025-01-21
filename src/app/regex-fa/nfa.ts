@@ -1,6 +1,5 @@
 import { FlatStates, Terminal } from './regex-fa';
-import { FlatDfa, toG6NodeId } from './dfa';
-import { GraphData, NodeData } from '@antv/g6';
+import { FlatDfa, toG6GraphData } from './dfa';
 
 export type FlatNfa = FlatDfa;
 
@@ -28,84 +27,7 @@ export function checkFlatNfa(flatNfa: FlatNfa): boolean {
 }
 
 export function nfaToG6GraphData(flatNfa: FlatNfa) {
-  const f = new Set<number>(flatNfa.f);
-
-  // 当没有节点时，添加一个虚拟起点
-  if (flatNfa.states.length == 0) {
-    flatNfa.states.push(0);
-  }
-
-  const graphData: GraphData = {
-    nodes: flatNfa.states.map((stateId) => {
-      let node: NodeData = {
-        id: toG6NodeId(stateId),
-        label: stateId.toString(),
-      };
-
-      if (f.has(stateId)) {
-        node = {
-          ...node,
-          ...{
-            type: 'triangle',
-            style: {
-              size: 30,
-              fill: '#EFF4FF',
-              lineWidth: 1,
-              stroke: '#5F95FF',
-              labelPlacement: 'center',
-              labelText: stateId.toString(),
-            },
-          },
-        };
-      } else {
-        node = {
-          ...node,
-          ...{
-            type: 'circle',
-            style: {
-              size: 30,
-              fill: '#EFF4FF',
-              lineWidth: 1,
-              stroke: '#5F95FF',
-              labelPlacement: 'center',
-              labelText: stateId.toString(),
-            },
-          },
-        };
-      }
-      return node;
-    }),
-    edges: flatNfa.flatEdges.map(({ source, target, terminal }, index) => {
-      return {
-        id: 'edge-' + index.toString(),
-        source: 'node-' + source.toString(),
-        target: 'node-' + target.toString(),
-        label: terminal,
-        type: source == target ? 'loop' : undefined,
-      };
-    }),
-  };
-
-  graphData.nodes!.push({
-    id: 'node-S',
-    type: 'diamond',
-    style: {
-      size: 30,
-      fill: '#EFF4FF',
-      lineWidth: 1,
-      stroke: '#5F95FF',
-      labelPlacement: 'center',
-      labelText: 'S',
-    },
-  });
-
-  graphData.edges!.push({
-    id: 'edge-S',
-    source: 'node-S',
-    target: 'node-' + flatNfa.s.toString(),
-  });
-
-  return graphData;
+  return toG6GraphData(flatNfa);
 }
 
 export interface ScEdge {

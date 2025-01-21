@@ -83,11 +83,11 @@ export function toG6GraphData(flatDfa: FlatDfa) {
         node = {
           ...node,
           ...{
-            type: 'triangle',
+            type: 'circle',
             style: {
               size: 30,
-              fill: '#EFF4FF',
-              lineWidth: 1,
+              fill: '#FFFFFF',
+              lineWidth: 5,
               stroke: '#5F95FF',
               labelPlacement: 'center',
               labelText: stateId.toString(),
@@ -125,11 +125,11 @@ export function toG6GraphData(flatDfa: FlatDfa) {
 
   graphData.nodes!.push({
     id: 'node-S',
-    type: 'diamond',
+    type: 'circle',
     style: {
       size: 30,
-      fill: '#EFF4FF',
-      lineWidth: 1,
+      fill: '#FFFFFF',
+      lineWidth: 0,
       stroke: '#5F95FF',
       labelPlacement: 'center',
       labelText: 'S',

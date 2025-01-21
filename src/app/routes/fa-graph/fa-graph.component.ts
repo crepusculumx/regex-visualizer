@@ -43,7 +43,7 @@ export class FaGraphComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     const container = this.container.nativeElement;
     const width = container!.width;
-    const height = 500;
+    const height = container!.height;
     const graph = new Graph({
       container: this.container.nativeElement,
       width,
