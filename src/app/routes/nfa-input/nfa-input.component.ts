@@ -238,7 +238,10 @@ export class NfaInputComponent {
       return res;
     }),
     filter(checkFlatNfa),
-    distinctUntilChanged(),
+    distinctUntilChanged((a, b) => {
+      // todo
+      return JSON.stringify(a) === JSON.stringify(b);
+    }),
     shareReplay(1),
   );
 

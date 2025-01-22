@@ -40,6 +40,7 @@ export class NfaToDfaComponent {
     switchMap((flatNfa) => {
       return from([null, flatNfa]);
     }),
+    shareReplay(1),
   );
 
   inputNfaG6$ = this.flatNfa$.pipe(
@@ -49,6 +50,7 @@ export class NfaToDfaComponent {
     map((flatNfa) => {
       return nfaToG6GraphData(flatNfa);
     }),
+    shareReplay(1),
   );
 
   scLog$ = this.flatNfa$.pipe(
@@ -58,6 +60,7 @@ export class NfaToDfaComponent {
       }
       return this.regexService.nfaToDfa$(nfa);
     }),
+    shareReplay(1),
   );
 
   scStepParams$: Observable<ScStepParams | null> = combineLatest([

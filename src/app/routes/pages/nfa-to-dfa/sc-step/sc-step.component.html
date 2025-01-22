@@ -20,9 +20,7 @@
       无
     }
     @for (edge of scStep.scEdges; track $index) {
-      <p nz-typography>
-        {{ edge.terminal }}: [ {{ scStep.curSubset.join(", ") }} ]
-      </p>
+      <p nz-typography>{{ edge.terminal }}: [ {{ edge.target.join(", ") }} ]</p>
     }
   </p>
   <p nz-typography>

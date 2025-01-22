@@ -6,6 +6,7 @@ import {
   map,
   Observable,
   shareReplay,
+  tap,
 } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { toObservable } from '@angular/core/rxjs-interop';
@@ -15,6 +16,8 @@ import { FormsModule } from '@angular/forms';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { Terminal } from '../../../../regex-fa/regex-fa';
 import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzRadioModule } from 'ng-zorro-antd/radio';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 
 export interface ScStepParams {
   flatNfa: FlatNfa;
@@ -43,6 +46,8 @@ interface TableParams {
     FormsModule,
     NzTypographyModule,
     NzTableModule,
+    NzRadioModule,
+    NzCheckboxModule,
   ],
   templateUrl: './sc-step.component.html',
   styleUrl: './sc-step.component.less',
@@ -53,7 +58,13 @@ export class ScStepComponent {
   scStepParams = input.required<ScStepParams>();
   scStepParams$: Observable<ScStepParams | null> = toObservable(
     this.scStepParams,
-  ).pipe(addPre(null), shareReplay(1));
+  ).pipe(
+    addPre(null),
+    tap(() => {
+      this.p$.next(1);
+    }),
+    shareReplay(1),
+  );
 
   scStep$: Observable<ScStep | null> = combineLatest([
     this.scStepParams$,
@@ -119,7 +130,9 @@ export class ScStepComponent {
           isF: step.curSubset.some((element) =>
             scStepParams.flatNfa.f.includes(element),
           ),
-          isS: step.curSubset.includes(scStepParams.flatNfa.s),
+          isS:
+            step.curSubset.length === 1 &&
+            step.curSubset.includes(scStepParams.flatNfa.s),
           state: `[ ${step.curSubset.join('. ')} ]`,
           transTable: res.terminals.map((terminal): string => {
             const edge = step.scEdges.find(

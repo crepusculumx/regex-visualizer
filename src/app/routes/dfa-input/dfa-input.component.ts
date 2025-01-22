@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import {
   BehaviorSubject,
   combineLatest,
+  distinctUntilChanged,
   filter,
   map,
   Observable,
@@ -223,6 +224,10 @@ export class DfaInputComponent {
       return res;
     }),
     filter(checkFlatDfa),
+    distinctUntilChanged((a, b) => {
+      // todo
+      return JSON.stringify(a) === JSON.stringify(b);
+    }),
     shareReplay(1),
   );
 
