@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { DfaInputComponent } from '../../dfa-input/dfa-input.component';
+import { DfaInputComponent } from '../../fa-input/dfa-input/dfa-input.component';
 import { FaGraphComponent } from '../../fa-graph/fa-graph.component';
 import { map, ReplaySubject, shareReplay, switchMap } from 'rxjs';
 import { FlatDfa, toG6GraphData } from '../../../regex-fa/dfa';

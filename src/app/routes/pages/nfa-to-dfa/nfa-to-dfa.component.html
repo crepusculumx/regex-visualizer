@@ -1,16 +1,15 @@
 <app-nfa-input (nfaChange)="inputNfa$.next($event)"></app-nfa-input>
 <nz-collapse>
   <nz-collapse-panel nzHeader="NFA" [nzActive]="true">
-    <app-fa-graph [data$]="inputNfaG6$"></app-fa-graph>
+    <app-fa-graph [data]="inputNfaG6$ | async"></app-fa-graph>
   </nz-collapse-panel>
   <nz-collapse-panel nzHeader="子集构造法" [nzActive]="true">
-    @if (scStepParams$ | async; as scStepParams) {
-      <app-sc-step [scStepParams]="scStepParams"></app-sc-step>
-    }
+    <app-sc-step [scStepParams]="scStepParams$ | async"></app-sc-step>
   </nz-collapse-panel>
   <nz-collapse-panel nzHeader="DFA" [nzActive]="true">
-    @if (dfaG6$ | async; as dfa) {
-      <app-fa-graph [data$]="dfaG6$"></app-fa-graph>
-    }
+    <app-fa-graph [data]="dfaG6$ | async"></app-fa-graph>
+  </nz-collapse-panel>
+  <nz-collapse-panel nzHeader="DFA的转移函数表" [nzActive]="true">
+    <app-fa-table [flatDfa]="dfa$ | async"></app-fa-table>
   </nz-collapse-panel>
 </nz-collapse>

@@ -1,13 +1,48 @@
-import { FlatStates, Terminal } from './regex-fa';
+import { FlatStates, StateId, States, Terminal } from './regex-fa';
 import { FlatDfa, toG6GraphData } from './dfa';
+import { tryEmplace } from '../tools/map-tool';
 
 export type FlatNfa = FlatDfa;
+
+export type NfaTransTable = Map<Terminal, States>;
+export type NfaTable = Map<StateId, NfaTransTable>;
+
+export class Nfa {
+  nfaTable: NfaTable = new Map<StateId, NfaTransTable>();
+  s: StateId;
+  f: States;
+
+  flatNfa: FlatDfa;
+
+  constructor(flatNfa: FlatDfa) {
+    this.flatNfa = flatNfa;
+    this.s = flatNfa.s;
+    this.f = new Set<StateId>(flatNfa.f);
+    for (const state of flatNfa.states) {
+      this.nfaTable.set(state, new Map<Terminal, States>());
+    }
+    for (const flatEdge of flatNfa.flatEdges) {
+      const transTable = tryEmplace(
+        this.nfaTable,
+        flatEdge.source,
+        new Map<Terminal, States>(),
+      );
+      tryEmplace(transTable, flatEdge.terminal, new Set<StateId>()).add(
+        flatEdge.target,
+      );
+    }
+  }
+
+  getTerminals() {
+    return [...new Set(this.flatNfa.flatEdges.map((edge) => edge.terminal))];
+  }
+}
 
 /**
  * Check if nfa is legal, true for legal
  * @param flatNfa
  */
-export function checkFlatNfa(flatNfa: FlatNfa): boolean {
+export function checkFlatNfa(flatNfa: FlatDfa): boolean {
   const states = new Set(flatNfa.states);
   function checkExistState(state: number) {
     if (!states.has(state)) {
@@ -26,7 +61,7 @@ export function checkFlatNfa(flatNfa: FlatNfa): boolean {
   return true;
 }
 
-export function nfaToG6GraphData(flatNfa: FlatNfa) {
+export function nfaToG6GraphData(flatNfa: FlatDfa) {
   return toG6GraphData(flatNfa);
 }
 
@@ -49,7 +84,7 @@ export interface ScTable {
 }
 
 export interface ScLog {
-  source: FlatNfa;
+  source: FlatDfa;
   target: FlatDfa;
   steps: ScStep[];
 }

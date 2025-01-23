@@ -4,13 +4,13 @@ import {
   DestroyRef,
   ElementRef,
   inject,
-  Input,
+  input,
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { combineLatest, Observable, ReplaySubject } from 'rxjs';
+import { combineLatest, ReplaySubject } from 'rxjs';
 import { Graph, GraphData } from '@antv/g6';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { NzCardModule } from 'ng-zorro-antd/card';
 
 @Component({
@@ -22,7 +22,8 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 export class FaGraphComponent implements OnInit, AfterViewInit {
   destroyRef = inject(DestroyRef);
 
-  @Input({ required: true }) data$!: Observable<GraphData>;
+  data = input.required<GraphData | null>();
+  data$ = toObservable(this.data);
 
   @ViewChild('container') container!: ElementRef;
 
@@ -32,6 +33,10 @@ export class FaGraphComponent implements OnInit, AfterViewInit {
     combineLatest([this.graph$, this.data$])
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(([graph, data]) => {
+        if (data === null) {
+          graph.clear();
+          return;
+        }
         // G6 bug, clear first.
         graph.clear().then(() => {
           graph.setData(data);

@@ -1,3 +1,6 @@
+import { FlatDfa } from './dfa';
+import { FlatNfa } from './nfa';
+
 export type StateId = number;
 
 export type Terminal = string;
@@ -13,3 +16,7 @@ export interface FlatEdge {
 export type FlatEdges = FlatEdge[];
 
 export type FlatStates = StateId[];
+
+export type FlatEpsilonNfa = string; // temp
+
+export type FlatFa = FlatDfa | FlatNfa | FlatEpsilonNfa;

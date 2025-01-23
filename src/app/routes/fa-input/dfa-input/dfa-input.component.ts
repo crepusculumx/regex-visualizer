@@ -1,4 +1,4 @@
-import { Component, Output } from '@angular/core';
+import { Component, DestroyRef, inject, input } from '@angular/core';
 import { NzCardComponent } from 'ng-zorro-antd/card';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { FormsModule } from '@angular/forms';
@@ -19,9 +19,16 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 
-import { StateId, Terminal } from '../../regex-fa/regex-fa';
-import { checkFlatDfa, FlatDfa } from '../../regex-fa/dfa';
+import { StateId, Terminal } from '../../../regex-fa/regex-fa';
+import { checkFlatDfa, Dfa, FlatDfa } from '../../../regex-fa/dfa';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
+import {
+  outputFromObservable,
+  takeUntilDestroyed,
+  toObservable,
+} from '@angular/core/rxjs-interop';
+import { filterNull, undefinedToNull } from '../../../tools/rxjs-tool';
+import { mapUndefinedToNull } from '../../../tools/functional-tool';
 
 interface DfaTableRowParam {
   stateId: StateId;
@@ -69,6 +76,13 @@ interface DfaTableInputs {
   styleUrl: './dfa-input.component.less',
 })
 export class DfaInputComponent {
+  private readonly destroyRef = inject(DestroyRef);
+  readonly dfa = input<FlatDfa>();
+  private readonly inputDfa$ = toObservable(this.dfa).pipe(
+    undefinedToNull(),
+    shareReplay(1),
+  );
+
   // When the number of rows changes, retain the filled in content.
   private dfaTableParams: DfaTableParams = {
     rows: [],
@@ -77,6 +91,34 @@ export class DfaInputComponent {
     terminals: [],
   };
 
+  private flatDfaSubFlag = true;
+  // noinspection JSUnusedLocalSymbols
+  private readonly flatDfaSub = this.inputDfa$
+    .pipe(filterNull(), takeUntilDestroyed(this.destroyRef))
+    .subscribe((flatDfa) => {
+      const dfa = new Dfa(flatDfa);
+      const terminals = dfa.getTerminals().sort();
+      this.dfaTableParams.statesSize = flatDfa.states.length;
+      this.dfaTableParams.terminals = terminals;
+      this.dfaTableParams.terminalsSize = terminals.length;
+      this.dfaTableParams.rows = flatDfa.states.map((state) => {
+        return {
+          isF: dfa.f.has(state),
+          isS: dfa.s === state,
+          stateId: state,
+          transTable: terminals
+            .map((terminal) => {
+              return dfa.dfaTable.get(state)!.get(terminal);
+            })
+            .map(mapUndefinedToNull),
+        };
+      });
+      this.flatDfaSubFlag = false;
+      this.statesSize$.next(this.dfaTableParams.statesSize);
+      this.flatDfaSubFlag = true;
+      this.terminalsSize$.next(this.dfaTableParams.terminalsSize);
+    });
+
   statesSize$ = new BehaviorSubject<number>(1);
   terminalsSize$ = new BehaviorSubject<number>(1);
 
@@ -84,6 +126,10 @@ export class DfaInputComponent {
     this.statesSize$,
     this.terminalsSize$,
   ]).pipe(
+    // if this changes because of inputDfa$, wait until both statesSize$ terminalsSize$ change.
+    filter(() => {
+      return this.flatDfaSubFlag;
+    }),
     // Resize this.dfaTableParams
     tap(([statesSize, terminalsSize]) => {
       this.dfaTableParams.statesSize = statesSize;
@@ -231,5 +277,5 @@ export class DfaInputComponent {
     shareReplay(1),
   );
 
-  @Output() dfaChange = this.flatDfa$;
+  dfaChange = outputFromObservable(this.flatDfa$);
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AsyncSubject, map, Observable } from 'rxjs';
 import { FlatDfa, HopcroftLog } from '../regex-fa/dfa';
-import { FlatNfa, ScLog } from '../regex-fa/nfa';
+import { ScLog } from '../regex-fa/nfa';
 
 // eslint-disable-next-line
 declare const Module: any;
@@ -41,7 +41,7 @@ export class RegexFaWasmService {
     return this.libCall<FlatDfa, HopcroftLog>('DfaMinimize', flatDfa);
   }
 
-  nfaToDfa$(flatNfa: FlatNfa) {
-    return this.libCall<FlatNfa, ScLog>('NfaToDfa', flatNfa);
+  nfaToDfa$(flatNfa: FlatDfa) {
+    return this.libCall<FlatDfa, ScLog>('NfaToDfa', flatNfa);
   }
 }

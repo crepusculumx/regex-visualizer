@@ -1,4 +1,4 @@
-import { Component, Output } from '@angular/core';
+import { Component, DestroyRef, inject, input, Output } from '@angular/core';
 import { NzCardComponent } from 'ng-zorro-antd/card';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { FormsModule } from '@angular/forms';
@@ -18,10 +18,14 @@ import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
-import { StateId, Terminal } from '../../regex-fa/regex-fa';
+import { StateId, Terminal } from '../../../regex-fa/regex-fa';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
-import { checkFlatNfa, FlatNfa } from '../../regex-fa/nfa';
-import { StatesInputComponent } from '../states-input/states-input.component';
+import { checkFlatNfa, Nfa } from '../../../regex-fa/nfa';
+import { StatesInputComponent } from '../../states-input/states-input.component';
+import { FlatDfa } from '../../../regex-fa/dfa';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { filterNull, undefinedToNull } from '../../../tools/rxjs-tool';
+import { mapUndefinedToNull } from '../../../tools/functional-tool';
 
 interface tableRowParam {
   stateId: StateId;
@@ -70,6 +74,12 @@ interface tableInputs {
   styleUrl: './nfa-input.component.less',
 })
 export class NfaInputComponent {
+  private readonly destroyRef = inject(DestroyRef);
+  readonly nfa = input<FlatDfa>();
+  private readonly inputNfa$: Observable<FlatDfa | null> = toObservable(
+    this.nfa,
+  ).pipe(undefinedToNull(), shareReplay(1));
+
   // When the number of rows changes, retain the filled in content.
   private tableParams: tableParams = {
     rows: [],
@@ -78,13 +88,48 @@ export class NfaInputComponent {
     terminals: [],
   };
 
-  statesSize$ = new BehaviorSubject<number>(1);
-  terminalsSize$ = new BehaviorSubject<number>(1);
+  public readonly statesSize$ = new BehaviorSubject<number>(1);
+  public readonly terminalsSize$ = new BehaviorSubject<number>(1);
+
+  private flatSubFlag = true;
+  // noinspection JSUnusedLocalSymbols
+  private readonly flatDfaSub = this.inputNfa$
+    .pipe(filterNull())
+    .subscribe((flatNfa) => {
+      const nfa = new Nfa(flatNfa);
+      const terminals = nfa.getTerminals().sort();
+      this.tableParams.statesSize = flatNfa.states.length;
+      this.tableParams.terminals = terminals;
+      this.tableParams.terminalsSize = terminals.length;
+      this.tableParams.rows = flatNfa.states.map((state) => {
+        return {
+          isF: nfa.f.has(state),
+          isS: nfa.s === state,
+          stateId: state,
+          transTable: terminals
+            .map((terminal) => {
+              return nfa.nfaTable.get(state)!.get(terminal);
+            })
+            .map(mapUndefinedToNull)
+            .map((data) => {
+              return data ? Array.from(data) : null;
+            }),
+        };
+      });
+      this.flatSubFlag = false;
+      this.statesSize$.next(this.tableParams.statesSize);
+      this.flatSubFlag = true;
+      this.terminalsSize$.next(this.tableParams.terminalsSize);
+    });
 
   tableInputs$: Observable<tableInputs> = combineLatest([
     this.statesSize$,
     this.terminalsSize$,
   ]).pipe(
+    // if this changes because of inputDfa$, wait until both statesSize$ terminalsSize$ change.
+    filter(() => {
+      return this.flatSubFlag;
+    }),
     // Resize this.tableParams
     tap(([statesSize, terminalsSize]) => {
       this.tableParams.statesSize = statesSize;
@@ -199,9 +244,9 @@ export class NfaInputComponent {
     shareReplay(1),
   );
 
-  flatNfa$: Observable<FlatNfa> = this.tableParams$.pipe(
+  flatNfa$: Observable<FlatDfa> = this.tableParams$.pipe(
     map((nfaTableParams) => {
-      const res: FlatNfa = {
+      const res: FlatDfa = {
         states: [],
         flatEdges: [],
         f: [],

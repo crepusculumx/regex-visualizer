@@ -1,7 +1,6 @@
-import { Component, DestroyRef, inject, Input, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, input } from '@angular/core';
 import { Terminal } from '../../regex-fa/regex-fa';
 import { FormsModule } from '@angular/forms';
-import { FlatNfa } from '../../regex-fa/nfa';
 import { Dfa, FlatDfa } from '../../regex-fa/dfa';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
@@ -9,9 +8,10 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
-import { map, Observable, ReplaySubject } from 'rxjs';
+import { shareReplay, merge, Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { filterUndefined, nullMap } from '../../tools/rxjs-tool';
 
 interface TableRowParam {
   state: string;
@@ -42,12 +42,20 @@ interface TableParams {
   templateUrl: './fa-table.component.html',
   styleUrl: './fa-table.component.less',
 })
-export class FaTableComponent implements OnInit {
+export class FaTableComponent {
   destroyRef$ = inject(DestroyRef);
-  @Input() flatDfa$: Observable<FlatDfa> | null = null;
-  @Input() flatNfa$: Observable<FlatNfa> | null = null;
+  flatDfa = input<FlatDfa | null>();
+  flatNfa = input<FlatDfa | null>();
 
-  tableParams$ = new ReplaySubject<TableParams>(1);
+  flatDfaTableParams$ = toObservable(this.flatDfa).pipe(
+    filterUndefined(),
+    nullMap(this.dfaToTableParams),
+    shareReplay(1),
+  );
+
+  tableParams$: Observable<TableParams | null> = merge(
+    this.flatDfaTableParams$,
+  );
 
   dfaToTableParams(flatDfa: FlatDfa) {
     const dfa = new Dfa(flatDfa);
@@ -78,13 +86,5 @@ export class FaTableComponent implements OnInit {
       };
     });
     return res;
-  }
-
-  ngOnInit() {
-    if (this.flatDfa$) {
-      this.flatDfa$
-        .pipe(map(this.dfaToTableParams), takeUntilDestroyed(this.destroyRef$))
-        .subscribe(this.tableParams$);
-    }
   }
 }

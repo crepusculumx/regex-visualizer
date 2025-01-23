@@ -14,10 +14,11 @@ import {
 import { FlatNfa, nfaToG6GraphData } from '../../../regex-fa/nfa';
 import { FaGraphComponent } from '../../fa-graph/fa-graph.component';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
-import { NfaInputComponent } from '../../nfa-input/nfa-input.component';
+import { NfaInputComponent } from '../../fa-input/nfa-input/nfa-input.component';
 import { ScStepComponent, ScStepParams } from './sc-step/sc-step.component';
 import { AsyncPipe } from '@angular/common';
 import { toG6GraphData } from '../../../regex-fa/dfa';
+import { FaTableComponent } from '../../fa-table/fa-table.component';
 
 @Component({
   selector: 'app-nfa-to-dfa',
@@ -27,6 +28,7 @@ import { toG6GraphData } from '../../../regex-fa/dfa';
     NfaInputComponent,
     ScStepComponent,
     AsyncPipe,
+    FaTableComponent,
   ],
   templateUrl: './nfa-to-dfa.component.html',
   styleUrl: './nfa-to-dfa.component.less',
@@ -83,6 +85,9 @@ export class NfaToDfaComponent {
       } else {
         return scLog.target;
       }
+    }),
+    filter((_) => {
+      return _ !== null;
     }),
     shareReplay(1),
   );

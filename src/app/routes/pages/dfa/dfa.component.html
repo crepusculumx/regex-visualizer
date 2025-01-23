@@ -1,2 +1,7 @@
-<app-dfa-input (dfaChange)="flatDfa$.next($event)"></app-dfa-input>
-<app-fa-graph [data$]="G6Graph$"></app-fa-graph>
+@if (faInputArgs$ | async; as faInputArgs) {
+  <app-fa-input
+    [faInputArgs]="faInputArgs"
+    (dfaChange)="dfa$.next($event)"
+  ></app-fa-input>
+  <app-fa-graph [data]="dfaG6$ | async"></app-fa-graph>
+}

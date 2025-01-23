@@ -1,7 +1,7 @@
 <app-dfa-input (dfaChange)="inputDfa$.next($event)"></app-dfa-input>
 <nz-collapse>
   <nz-collapse-panel nzHeader="待最小化的DFA" [nzActive]="true">
-    <app-fa-graph [data$]="inputDfaG6$"></app-fa-graph>
+    <app-fa-graph [data]="inputDfaG6$ | async"></app-fa-graph>
   </nz-collapse-panel>
   <nz-collapse-panel nzHeader="Hopcroft过程" [nzActive]="true">
     <!--    使用*ngIf强制生成新组件-->
@@ -19,9 +19,9 @@
     </nz-collapse>
   </nz-collapse-panel>
   <nz-collapse-panel nzHeader="最小化后的DFA" [nzActive]="true">
-    <app-fa-graph [data$]="minimizeDfaG6$"></app-fa-graph>
+    <app-fa-graph [data]="minimizeDfaG6$ | async"></app-fa-graph>
   </nz-collapse-panel>
   <nz-collapse-panel nzHeader="最小化后的DFA的转移函数表" [nzActive]="true">
-    <app-fa-table [flatDfa$]="minimizeDfa$"></app-fa-table>
+    <app-fa-table [flatDfa]="minimizeDfa$ | async"></app-fa-table>
   </nz-collapse-panel>
 </nz-collapse>

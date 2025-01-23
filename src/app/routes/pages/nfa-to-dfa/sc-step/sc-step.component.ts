@@ -10,7 +10,7 @@ import {
 } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { addPre } from '../../../../rxjs-tool/rxjs-tool';
+import { addPre } from '../../../../tools/rxjs-tool';
 import { NzSliderModule } from 'ng-zorro-antd/slider';
 import { FormsModule } from '@angular/forms';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
@@ -55,7 +55,7 @@ interface TableParams {
 export class ScStepComponent {
   p$ = new BehaviorSubject<number>(1);
 
-  scStepParams = input.required<ScStepParams>();
+  scStepParams = input.required<ScStepParams | null>();
   scStepParams$: Observable<ScStepParams | null> = toObservable(
     this.scStepParams,
   ).pipe(

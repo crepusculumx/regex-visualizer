@@ -16,7 +16,15 @@ export default [
         component: DfaComponent,
       },
       {
+        path: 'dfa/:digest',
+        component: DfaComponent,
+      },
+      {
         path: 'nfa',
+        component: NfaComponent,
+      },
+      {
+        path: 'nfa/:digest',
         component: NfaComponent,
       },
       {

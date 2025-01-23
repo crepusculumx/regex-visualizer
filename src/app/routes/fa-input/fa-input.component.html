@@ -1,0 +1,98 @@
+@if (faInputArgs$ | async; as faInputArgs) {
+  @if (faInputArgs.faDigest) {
+    @if (faInputParams$ | async; as faInputParams) {
+      <nz-page-header
+        [nzTitle]="faInputParams.faData.type"
+        [nzSubtitle]="faInputParams.faData.name"
+        [nzGhost]="false"
+      ></nz-page-header>
+
+      @switch (faInputParams.faData.type) {
+        @case (FaType.DFA) {
+          <app-dfa-input
+            [dfa]="faInputParams.fa | asDfa"
+            (dfaChange)="fa$.next($event)"
+          ></app-dfa-input>
+        }
+        @case (FaType.NFA) {
+          <app-nfa-input
+            [nfa]="faInputParams.fa | asNfa"
+            (nfaChange)="fa$.next($event)"
+          ></app-nfa-input>
+        }
+      }
+
+      <nz-card>
+        <form nz-form [nzLayout]="'inline'">
+          <nz-form-item>
+            <input
+              nz-input
+              placeholder="未命名模型"
+              [ngModel]="formName$ | async"
+              (ngModelChange)="formName$.next($event)"
+              [ngModelOptions]="{ standalone: true }"
+            />
+          </nz-form-item>
+          <nz-form-item>
+            <button
+              nz-button
+              nzType="primary"
+              (click)="update$.next(true)"
+              [nzLoading]="buttonLoading$ | async"
+            >
+              更新模型
+            </button>
+          </nz-form-item>
+          <nz-form-item>
+            <button
+              nz-button
+              nzType="primary"
+              (click)="add$.next(true)"
+              [nzLoading]="buttonLoading$ | async"
+            >
+              新增模型
+            </button>
+          </nz-form-item>
+        </form>
+      </nz-card>
+    }
+  } @else {
+    <nz-page-header
+      [nzTitle]="faInputArgs.faType"
+      [nzGhost]="false"
+    ></nz-page-header>
+
+    @switch (faInputArgs.faType) {
+      @case (FaType.DFA) {
+        <app-dfa-input (dfaChange)="fa$.next($event)"></app-dfa-input>
+      }
+      @case (FaType.NFA) {
+        <app-nfa-input (nfaChange)="fa$.next($event)"></app-nfa-input>
+      }
+    }
+
+    <nz-card>
+      <form nz-form [nzLayout]="'inline'">
+        <nz-form-item>
+          <input
+            nz-input
+            placeholder="未命名模型"
+            [ngModel]="formName$ | async"
+            (ngModelChange)="formName$.next($event)"
+            [ngModelOptions]="{ standalone: true }"
+          />
+        </nz-form-item>
+        <nz-form-item>
+          <button
+            nz-button
+            nzType="primary"
+            (click)="add$.next(true)"
+            [nzLoading]="buttonLoading$ | async"
+          >
+            新增模型
+          </button>
+        </nz-form-item>
+      </form>
+    </nz-card>
+  }
+}
