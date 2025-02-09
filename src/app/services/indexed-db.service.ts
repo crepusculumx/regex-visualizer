@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, ReplaySubject, Subscriber, switchMap } from 'rxjs';
+import { AsyncSubject, Observable, Subscriber, switchMap } from 'rxjs';
 import { stores } from './indexed-db-stores';
 
 @Injectable({
@@ -8,7 +8,7 @@ import { stores } from './indexed-db-stores';
 export class IndexedDBService {
   private dbName = 'fa-db';
   private dbVersion = 1;
-  private db$ = new ReplaySubject<IDBDatabase>();
+  private db$ = new AsyncSubject<IDBDatabase>();
 
   constructor() {
     this.initDB();
@@ -33,6 +33,7 @@ export class IndexedDBService {
     request.onsuccess = () => {
       const db = request.result;
       this.db$.next(db);
+      this.db$.complete();
       this.initStore(db);
     };
 
