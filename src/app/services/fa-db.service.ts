@@ -65,7 +65,7 @@ export class FaDbService {
       name,
       type,
     };
-    return this.digest$(faData.data).pipe(
+    return this.digest$(JSON.stringify(faData)).pipe(
       map((digest) => {
         faData.digest = digest;
         return faData;
