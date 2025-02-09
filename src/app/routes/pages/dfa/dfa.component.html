@@ -2,6 +2,7 @@
   <app-fa-input
     [faInputArgs]="faInputArgs"
     (dfaChange)="dfa$.next($event)"
+    (digitChange)="router.navigate(['/', FaType.DFA, $event])"
   ></app-fa-input>
   <app-fa-graph [data]="dfaG6$ | async"></app-fa-graph>
 }

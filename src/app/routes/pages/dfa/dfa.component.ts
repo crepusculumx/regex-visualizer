@@ -4,7 +4,7 @@ import {
   FaInputArgs,
   FaInputComponent,
 } from '../../fa-input/fa-input.component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FaType } from '../../../services/fa-db.service';
 import { AsyncPipe } from '@angular/common';
 import { FlatDfa, toG6GraphData } from '../../../regex-fa/dfa';
@@ -17,7 +17,8 @@ import { FaGraphComponent } from '../../fa-graph/fa-graph.component';
   styleUrl: './dfa.component.less',
 })
 export class DfaComponent {
-  private readonly route = inject(ActivatedRoute);
+  protected readonly route = inject(ActivatedRoute);
+  readonly router = inject(Router);
 
   private readonly digest$ = this.route.paramMap.pipe(
     map((params) => {
@@ -40,4 +41,5 @@ export class DfaComponent {
     map(toG6GraphData),
     shareReplay(1),
   );
+  protected readonly FaType = FaType;
 }

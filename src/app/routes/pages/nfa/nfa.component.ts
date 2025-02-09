@@ -7,7 +7,7 @@ import {
   FaInputArgs,
   FaInputComponent,
 } from '../../fa-input/fa-input.component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FaType } from '../../../services/fa-db.service';
 
 @Component({
@@ -18,6 +18,7 @@ import { FaType } from '../../../services/fa-db.service';
 })
 export class NfaComponent {
   private readonly route = inject(ActivatedRoute);
+  readonly router = inject(Router);
 
   private readonly digest$ = this.route.paramMap.pipe(
     map((params) => {
@@ -40,4 +41,5 @@ export class NfaComponent {
     map(nfaToG6GraphData),
     shareReplay(1),
   );
+  protected readonly FaType = FaType;
 }

@@ -116,7 +116,7 @@ export class FaInputComponent {
 
   readonly digestChange$ = new ReplaySubject<string>();
 
-  // noinspection JSUnusedGlobalSymbols
+  // noinspection JSUnusedLocalSymbols
   private readonly updateSub = this.update$
     .pipe(
       withLatestFrom(
@@ -151,7 +151,7 @@ export class FaInputComponent {
       this.digestChange$.next(digest);
     });
 
-  // noinspection JSUnusedGlobalSymbols
+  // noinspection JSUnusedLocalSymbols
   private readonly addSub = this.add$
     .pipe(
       withLatestFrom(
