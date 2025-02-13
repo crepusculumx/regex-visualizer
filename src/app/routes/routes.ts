@@ -5,6 +5,8 @@ import { DfaComponent } from './pages/dfa/dfa.component';
 import { DfaMinimizeComponent } from './pages/dfa-minimize/dfa-minimize.component';
 import { NfaComponent } from './pages/nfa/nfa.component';
 import { NfaToDfaComponent } from './pages/nfa-to-dfa/nfa-to-dfa.component';
+import { FaListComponent } from './pages/fa-list/fa-list.component';
+import { FaType } from '../services/fa-db.service';
 
 export default [
   {
@@ -12,19 +14,19 @@ export default [
     component: BasicLayoutComponent,
     children: [
       {
-        path: 'dfa',
+        path: `${FaType.DFA}`,
         component: DfaComponent,
       },
       {
-        path: 'dfa/:digest',
+        path: `${FaType.DFA}/:digest`,
         component: DfaComponent,
       },
       {
-        path: 'nfa',
+        path: `${FaType.NFA}`,
         component: NfaComponent,
       },
       {
-        path: 'nfa/:digest',
+        path: `${FaType.NFA}/:digest`,
         component: NfaComponent,
       },
       {
@@ -34,6 +36,10 @@ export default [
       {
         path: 'nfa-to-dfa',
         component: NfaToDfaComponent,
+      },
+      {
+        path: 'fa-list',
+        component: FaListComponent,
       },
     ],
   },

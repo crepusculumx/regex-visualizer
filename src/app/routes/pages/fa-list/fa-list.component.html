@@ -1,0 +1,55 @@
+<nz-page-header nzTitle="模型" [nzGhost]="false"> </nz-page-header>
+<nz-card>
+  <nz-checkbox-group
+    [nzOptions]="options"
+    [ngModel]="checkBoxValue$ | async"
+    (ngModelChange)="checkBoxValue$.next($event)"
+  />
+</nz-card>
+
+@if (data$ | async; as data) {
+  <nz-table
+    #fixedTable
+    [nzData]="data"
+    [nzFrontPagination]="false"
+    [nzTotal]="(total$ | async)!"
+    [nzLoading]="loading$ | async"
+    [nzPageIndex]="(pageIndex$ | async)!"
+    [nzPageSize]="(pageSize$ | async)!"
+    (nzPageSizeChange)="this.pageSize$.next($event)"
+    (nzPageIndexChange)="this.pageIndex$.next($event)"
+  >
+    <thead>
+      <tr>
+        <th>名称</th>
+        <th>类型</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of data; track $index) {
+        <tr>
+          <td>{{ item.name }}</td>
+          <td>{{ item.type }}</td>
+          <td nzRight>
+            <button
+              nz-button
+              nzType="link"
+              [routerLink]="['/', item.type, item.digest]"
+            >
+              编辑
+            </button>
+            <button
+              nz-button
+              nzType="text"
+              (click)="onDel(item.digest)"
+              [nzDanger]="true"
+            >
+              删除
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </nz-table>
+}

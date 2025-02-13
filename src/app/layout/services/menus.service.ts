@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Menus } from '../interfaces/menu';
+import { FaType } from '../../services/fa-db.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,7 +22,7 @@ export class MenusService {
           icon: '',
           selected: false,
           disabled: false,
-          routerLink: ['dfa'],
+          routerLink: [FaType.DFA],
         },
         {
           title: 'NFA',
@@ -29,7 +30,7 @@ export class MenusService {
           icon: '',
           selected: false,
           disabled: false,
-          routerLink: ['nfa'],
+          routerLink: [FaType.NFA],
         },
       ],
     },
@@ -58,6 +59,14 @@ export class MenusService {
           routerLink: ['nfa-to-dfa'],
         },
       ],
+    },
+    {
+      title: '已保存的模型',
+      level: 1,
+      icon: '',
+      selected: false,
+      disabled: false,
+      routerLink: ['fa-list'],
     },
   ]);
   get menus$(): Observable<Menus> {
